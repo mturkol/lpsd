@@ -1,0 +1,93 @@
+2019-12-05
+
+lpsd.c
+  ExpMinusOne subfunction for accurate computation of "exp(x)-1" in Eqn. 15
+  bugfix: segment stepping cond. uses inequality: while(start + nfft <= nread)
+  added the variable 'segOffset' under getDFT(), getDFT2() funcs
+  added MAX(), MIN() macros to be used with int type
+  getDFT(), getDFT2() round down seg. offset: MAX( 1,floor(ndft-ndft*ovlp/100) )
+
+2019-12-04
+lpsd.c
+  use the exact formula in Eqn 15 instead of the approx. one for r'(j) ( fresa )
+  changed the '>' operator to '>=' for fres calc. in calc_params()
+  bugfix: LR==0 condition was incorrectly set a=1.0 in remove_drift2()
+
+2007-06-28
+
+detect corrupt input files, issue warning, stop program
+
+2006-11-16
+
+lpsd writes the command line into the datafile and the gnuplot file
+
+2006-11-14
+
+lpsd can now handle datafiles that include comments
+comments must be indicated by a # at the beginning of the line
+
+2006-09-22
+
+implementation of 
+  command line argument -l OVLP
+  asking for OVLP when ? in config file
+  not asking for colB when no ? in config file
+  
+2006-09-01
+
+bugfix: in files with time column, the mean sampling time was computed correctly
+but not used; instead, the default sampling frequency was used
+
+2006-05-10
+
+recognize ?colA, ?colB in config file (config.c)
+
+2006-04-10
+
+lpsd now reads multi-column datafiles
+lpsd now can process difference of two columns
+lpsd now works without configuration file
+
+2004-06-15
+
+bugfix for FFTW mode: set cfg.nfft correctly
+
+2004-05-21
+
+remove alternative method for frequency node generation
+implementation of FFT using FFTW3
+Makefile changed: chmod 755 lpsd
+
+2004-05-01
+
+lpsd.c clean up of calc_params
+
+2004-04-11
+
+parameter for minimum number of averages added
+(lpsd.c lpsd-exec.c ArgParser.c, config, lpsd.cfg)
+
+2004-04-04
+
+lpsd.c : comments added to calc_params, 
+	 variables dist, f2last, fres2 last and code deleted
+	 - were not used anyway
+
+2004-03-28
+
+configuration information modified
+
+2004-03-26
+
+configuration information modified
+data structure clean up (psll)
+bugfix: don't ask for gnuterm when given on command line
+
+2004-03-25
+
+added SBIN variable in lpsd.cfg
+
+2004-03-22
+
+lpsd compiles under DOS with command line parsing
+scaling factor support for command line added
