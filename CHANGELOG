@@ -8,6 +8,7 @@ lpsd.c
   getDFT(), getDFT2() round down seg. offset: MAX( 1,floor(ndft-ndft*ovlp/100) )
 
 2019-12-04
+
 lpsd.c
   use the exact formula in Eqn 15 instead of the approx. one for r'(j) ( fresa )
   changed the '>' operator to '>=' for fres calc. in calc_params()
