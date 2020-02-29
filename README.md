@@ -7,9 +7,9 @@ This repository provides the implementation of the LPSD algorithm for spectrum
 and spectral density estimation from long time series by Fourier transforms at
 frequencies equally spaced on a logarithmic axis.
 
-It is written in C by Michael Tröbs and [Gerhard Heinzel](mailto:gerhard.heinzel@aei.mpg.de). 
-Improvements on accuracy, bug-fixes and corrections in algorithm flow were 
-made by [Mert Türkol](mailto:mturkol_at_gmail_dot_com).
+It is written in C by Michael Tröbs and Gerhard Heinzel. 
+Improvements on accuracy, bug-fixes and corrections in algorithm flow were  made 
+by [Mert Türkol](mailto:mturkol_at_gmail_dot_com).
 
 
 ## Table of Contents
