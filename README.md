@@ -114,7 +114,7 @@ The command options `lpsd` understands:
 
 For a more theoretical understanding read the following publication:
 
-  * [https://doi.org/10.1016/j.measurement.2005.10.010](https://doi.org/10.1016/j.measurement.2005.10.010)
+  * [Tröbs, M. and Heinzel, G., 2006. Improved spectrum estimation from digitized time series on a logarithmic frequency axis](https://doi.org/10.1016/j.measurement.2005.10.010)
 
 ### File Overview
 
