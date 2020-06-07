@@ -97,7 +97,8 @@ static double *dwin;		/* pointer to window function for FFT */
  // Added on 12/5/2019 for accurate computation of exp(x) - 1
  // Calculate exp(x) - 1.
  // The most direct method is inaccurate for very small arguments.
-double ExpMinusOne(double x)
+double 
+ExpMinusOne(double x)
 {
 	const double p1 = 0.914041914819518e-09;
 	const double p2 = 0.238082361044469e-01;
@@ -109,16 +110,16 @@ double ExpMinusOne(double x)
 	double rexp = 0.0;
 
 	// Use rational approximation for small arguments.
-	if (fabs(x) < 0.15)
-	{
-		rexp = x * (((p2*x + p1)*x + 1.0) / ((((q4*x + q3)*x + q2)*x + q1)*x + 1.0));
-		return rexp;
+	if (fabs(x) < 0.15) {
+		rexp = x * ( ( (p2*x + p1)*x + 1.0 ) / 
+    ( ( ( (q4*x + q3)*x + q2)*x + q1)*x + 1.0) );
+		
+    return rexp;
 	}
 
 	// For large negative arguments, direct calculation is OK.
 	double w = exp(x);
-	if (x <= -0.15)
-	{
+	if (x <= -0.15) {
 		rexp = w - 1.0;
 		return rexp;
 	}
@@ -140,48 +141,50 @@ remove_drift (double *segm, double *data, int nfft, int LR)
 {
   int i;
   long double sx, sy, stt, sty, xm, t;
-double a,b;
-  if (LR == 2)
-    {				/* subtract straight line through first and last point */
-      a = data[0];
-      b = data[nfft - 1] - data[0] / (double) (nfft - 1.0);
-      for (i = 0; i < nfft; i++)
-	{
-	  segm[i] = data[i] - (a + b * i);
-	}
-    }
-  else if (LR == 1)
-    {				/* linear regression */
+  double a,b;
+  
+  if (LR == 2)  { /* subtract straight line through first and last point */
+    a = data[0];
+    b = data[nfft - 1] - data[0] / (double) (nfft - 1.0);
 
-      sx = sy = 0;
-      for (i = 0; i < nfft; i++)
-	{
-	  sx += i;
-	  sy += data[i];
-	}
-      xm = sx / nfft;
-      stt = sty = 0;
-      for (i = 0; i < nfft; i++)
-	{
-	  t = i - xm;
-	  stt += t * t;
-	  sty += t * data[i];
-	}
-      b = sty / stt;
-      a = (sy - sx * b) / nfft;
-      for (i = 0; i < nfft; i++)
-	{
-	  segm[i] = data[i] - (a + b * i);
-	}
+    for (i = 0; i < nfft; i++)  {
+      segm[i] = data[i] - (a + b * i);
     }
-  else if (LR == 0)
-    {				/* copy data */
-      for (i = 0; i < nfft; i++)
-	{
-	  segm[i] = data[i];
-	}
+
+  }
+
+  else if (LR == 1) { /* linear regression */
+    sx = sy = 0;
+    for (i = 0; i < nfft; i++)  {
+	    sx += i;
+	    sy += data[i];
     }
-}
+
+    xm = sx / nfft;
+    stt = sty = 0;
+    for (i = 0; i < nfft; i++)  {
+      t = i - xm;
+      stt += t * t;
+      sty += t * data[i];
+	  }
+
+    b = sty / stt;
+    a = (sy - sx * b) / nfft;
+
+    for (i = 0; i < nfft; i++)  {
+      segm[i] = data[i] - (a + b * i);
+    }
+
+  } //end-if linear regression
+
+  else if (LR == 0) { /* no detrending, just copy data */
+      
+    for (i = 0; i < nfft; i++)  {
+      segm[i] = data[i];
+	  }
+
+  } //end-if no-detrend
+} //end-of remove_drift()
 
 static void
 remove_drift2 (double *a, double *b, double *data, int nfft, int LR)
@@ -189,33 +192,34 @@ remove_drift2 (double *a, double *b, double *data, int nfft, int LR)
   int i;
   long double sx, sy, stt, sty, xm, ndbl;
 
-  if (LR == 2)
-    {				/* subtract straight line through first and last point */
+  if (LR == 2)  { /* subtract straight line through first and last point */
       *a = data[0];
       *b = data[nfft - 1] - data[0] / (double) (nfft - 1.0);
-    }
-  else if (LR == 1)
-    {				/* linear regression */
-      ndbl = (long double) nfft;
-      xm = (ndbl - 1.0L) / 2.0L;
-      sx = ndbl * xm;
-      stt = (ndbl * ndbl - 1.0L) * ndbl / 12.0L;
-      sy = sty = 0.L;
-      for (i = 0; i < nfft; i++)
-	{
-	  sy += data[i];
-	  sty += (i - xm) * data[i];
-	}
-      *b = sty / stt;
-      *a = (sy - sx * *b) / nfft;
-    }
-  else if (LR == 0)
-    {				/* copy data */
-      //*a = 1.0;
+  }
+
+  else if (LR == 1) { /* linear regression */
+    ndbl = (long double) nfft;
+    xm = (ndbl - 1.0L) / 2.0L;
+    sx = ndbl * xm;
+    stt = (ndbl * ndbl - 1.0L) * ndbl / 12.0L;
+    sy = sty = 0.L;
+
+    for (i = 0; i < nfft; i++)  {
+      sy += data[i];
+      sty += (i - xm) * data[i];
+	  }
+
+    *b = sty / stt;
+    *a = (sy - sx * *b) / nfft;
+    
+  } //end-if linear regression
+
+  else if (LR == 0){  /* copy data */
+    //*a = 1.0;
 	  *a = 0.0;
-      *b = 0.0;
-    }
-}
+    *b = 0.0;
+  } //end-if no detrend
+} //end-of remove_drift2
 
 
 /********************************************************************************
@@ -231,7 +235,7 @@ remove_drift2 (double *a, double *b, double *data, int nfft, int LR)
  ********************************************************************************/
 static void
 getDFT (int nfft, double bin, double fsamp, double ovlp, int LR, double *rslt,
-	int *avg)
+	      int *avg)
 {
   double *dwincs;		/* pointer to array containing window function*cos,window function*sin */
   int i, j;
@@ -267,11 +271,11 @@ getDFT (int nfft, double bin, double fsamp, double ovlp, int LR, double *rslt,
 
   /* calculate first DFT */
   dft_re = dft_im = 0;
-  for (i = 0, j = 0; i < nfft; i++, j += 2)
-    {
-      dft_re += dwincs[j] * segm[i];
-      dft_im += dwincs[j + 1] * segm[i];
-    }
+  for (i = 0, j = 0; i < nfft; i++, j += 2) {
+    dft_re += dwincs[j] * segm[i];
+    dft_im += dwincs[j + 1] * segm[i];
+  }
+
   dft2 = dft_re * dft_re + dft_im * dft_im;
   west_sumw = 1.;
   west_m = dft2;
@@ -283,32 +287,31 @@ getDFT (int nfft, double bin, double fsamp, double ovlp, int LR, double *rslt,
   //int segOffset = MAX(1, nfft - xOlap);
   start += segOffset; /* go to next segment */
   /* process other segments if available */
-  while (start + nfft <= nread) //(start + nfft < nread)
-    {
+  while (start + nfft <= nread) { //(start + nfft < nread)
       remove_drift (&segm[0], &data[start], nfft, LR);
 
       /* calculate DFT */
       dft_re = dft_im = 0;
-      for (i = 0, j = 0; i < nfft; i++, j += 2)
-	{
-	  dft_re += dwincs[j] * segm[i];
-	  dft_im += dwincs[j + 1] * segm[i];
-	}
+      for (i = 0, j = 0; i < nfft; i++, j += 2) {
+        dft_re += dwincs[j] * segm[i];
+        dft_im += dwincs[j + 1] * segm[i];
+	    }
+
       dft2 = dft_re * dft_re + dft_im * dft_im;
 
-	  west_q = dft2 - west_m; //(x_k - M_k-1)
-	  west_temp = west_sumw + 1.; //k
-	  //2nd term in M_k = M_k-1 + (x_k - M_k-1)/k
-	  west_r = west_q / west_temp;
-	  west_m += west_r; //M_k-1 + (x_k - M_k-1)/k)
-	  //S_k-1 + (x_k - M_k)*(x_k - M_k-1)
-	  west_t += west_r * west_sumw * west_q;
-	  west_sumw = west_temp;
+      west_q = dft2 - west_m; //(x_k - M_k-1)
+      west_temp = west_sumw + 1.; //k
+      //2nd term in M_k = M_k-1 + (x_k - M_k-1)/k
+      west_r = west_q / west_temp;
+      west_m += west_r; //M_k-1 + (x_k - M_k-1)/k)
+      //S_k-1 + (x_k ï¿½ M_k)*(x_k ï¿½ M_k-1)
+      west_t += west_r * west_sumw * west_q;
+      west_sumw = west_temp;
 
       nsum++;
       //start += nfft * (1.0 - (double) (ovlp / 100.));	/* go to next segment */
-	  start += segOffset; /* go to next segment */
-    }
+  	  start += segOffset; /* go to next segment */
+    } //end-while segmentEnds < nread
 
   /* return result */
   rslt[0] = west_m;
@@ -336,7 +339,7 @@ getDFT (int nfft, double bin, double fsamp, double ovlp, int LR, double *rslt,
 
 static void
 getDFT2 (int nfft, double bin, double fsamp, double ovlp, int LR,
-	 double *rslt, int *avg)
+	      double *rslt, int *avg)
 {
   double *dwincs;		/* pointer to array containing window function*cos,window function*sin */
   int i;
@@ -373,12 +376,12 @@ getDFT2 (int nfft, double bin, double fsamp, double ovlp, int LR,
   dft_re = dft_im = 0;
   datp = data;
   winp = dwincs;
-  for (i = 0; i < nfft; i++)
-    {
-      y = *(datp++) - (a + b * i);
-      dft_re += *(winp++) * y;
-      dft_im += *(winp++) * y;
-    }
+  for (i = 0; i < nfft; i++)  {
+    y = *(datp++) - (a + b * i);
+    dft_re += *(winp++) * y;
+    dft_im += *(winp++) * y;
+  }
+
   dft2 = dft_re * dft_re + dft_im * dft_im;
   west_sumw = 1.;
   west_m = dft2;
@@ -390,35 +393,35 @@ getDFT2 (int nfft, double bin, double fsamp, double ovlp, int LR,
   //int segOffset = MAX( 1, nfft - xOlap );
   start += segOffset; /* go to next segment */
   /* process other segments if available */
-  while (start + nfft <= nread) //(start + nfft < nread)
-    {
-      remove_drift2 (&a, &b, &data[start], nfft, LR);
+  while (start + nfft <= nread) { //(start + nfft < nread)
+    remove_drift2 (&a, &b, &data[start], nfft, LR);
 
-      /* calculate DFT */
-      dft_re = dft_im = 0;
-      datp = data + start;
-      winp = dwincs;
-      for (i = 0; i < nfft; i++)
-	{
-	  y = *(datp++) - (a + b * i);
-	  dft_re += *(winp++) * y;
-	  dft_im += *(winp++) * y;
-	}
-      dft2 = dft_re * dft_re + dft_im * dft_im;
+    /* calculate DFT */
+    dft_re = dft_im = 0;
+    datp = data + start;
+    winp = dwincs;
 
-      west_q = dft2 - west_m; //(x_k - M_k-1)
-      west_temp = west_sumw + 1.; //k
+    for (i = 0; i < nfft; i++)  {
+      y = *(datp++) - (a + b * i);
+      dft_re += *(winp++) * y;
+      dft_im += *(winp++) * y;
+    }
+
+    dft2 = dft_re * dft_re + dft_im * dft_im;
+
+    west_q = dft2 - west_m; //(x_k - M_k-1)
+    west_temp = west_sumw + 1.; //k
 	  //2nd term in M_k = M_k-1 + (x_k - M_k-1)/k
-      west_r = west_q / west_temp; 
-      west_m += west_r; //M_k-1 + (x_k - M_k-1)/k)
-	  //S_k-1 + (x_k – M_k)*(x_k – M_k-1)
-      west_t += west_r * west_sumw * west_q;
-      west_sumw = west_temp;
+    west_r = west_q / west_temp; 
+    west_m += west_r; //M_k-1 + (x_k - M_k-1)/k)
+    //S_k-1 + (x_k - M_k)*(x_k - M_k-1)
+    west_t += west_r * west_sumw * west_q;
+    west_sumw = west_temp;
 
-      nsum++;
+    nsum++;
 	  //start += nfft * (1.0 - (double) (ovlp / 100.));	/* go to next segment */
 	  start += segOffset; /* go to next segment */
-    }
+  } //end-while segmentEnds < nread
 
   /* return result */
   rslt[0] = west_m;
@@ -442,7 +445,6 @@ getDFT2 (int nfft, double bin, double fsamp, double ovlp, int LR,
   /* clean up */
   xfree (dwincs);
 }
-
 
 /*
 	calculates paramaters for DFTs
@@ -488,27 +490,27 @@ calc_params (tCFG * cfg, tDATA * data)
   //gfact = log((*cfg).fmax / (*cfg).fmin);
   logfact = 1.0 / ((*cfg).nspec - 1.0) * log((*cfg).fmax / (*cfg).fmin);
 
-  for (i = 0, f = (*cfg).fmin; f <= (*cfg).fmax; i++)
-    {
+  for (i = 0, f = (*cfg).fmin; f <= (*cfg).fmax; i++) {
     /* desired freq. res. */
     //fresa = f / ((*cfg).nspec - 1.) * log ((*cfg).fmax / (*cfg).fmin);	
     /* desired freq. res.; using accurate exp(x) - 1 */
 	  fresa = (*cfg).fmin * exp((double)i * logfact) * ( ExpMinusOne(logfact) );	
 	  fres = (fresa >= fresb) ? fresa : sqrt (fresa * fresb); //Eqns. 18
-      if (fres < fresc)
-	fres = fresc;
-      ndft = round ((*cfg).fsamp / fres);
-      fres = (*cfg).fsamp / ndft;
-      bin = (f / fres);
-      navg = ((double) ((nread - ndft)) * ovfact) / ndft + 1; //not used
-      (*data).fspec[i] = f;
-      (*data).nffts[i] = ndft;
-      (*data).bins[i] = bin;
-	  //(*data).avg[i] = round (navg);
-      f = f + fres;
-    }
+
+    if (fres < fresc) fres = fresc;
+    ndft = round ((*cfg).fsamp / fres);
+    fres = (*cfg).fsamp / ndft;
+    bin = (f / fres);
+    navg = ((double) ((nread - ndft)) * ovfact) / ndft + 1; //not used
+    (*data).fspec[i] = f;
+    (*data).nffts[i] = ndft;
+    (*data).bins[i] = bin;
+    //(*data).avg[i] = round (navg);
+    f = f + fres;
+  } //end-for f[i] <= fmax
+
   (*cfg).nspec = i;		/* counter has been increased by 1 by for loop */
-}
+} //end-of calc_params()
 
 void
 calculate_lpsd (tCFG * cfg, tDATA * data)
@@ -526,27 +528,31 @@ calculate_lpsd (tCFG * cfg, tDATA * data)
   start = tv.tv_sec + tv.tv_usec / 1e6;
   now = start;
   print = start;
-  for (k = 0; k < (*cfg).nspec; k++)
-    {
+
+  for (k = 0; k < (*cfg).nspec; k++)  {
+
     if (FAST)
       getDFT2 ((*data).nffts[k], (*data).bins[k], (*cfg).fsamp, (*cfg).ovlp,
+	    (*cfg).LR, &rslt[0], &(*data).avg[k]);
+    else
+      getDFT ((*data).nffts[k], (*data).bins[k], (*cfg).fsamp, (*cfg).ovlp,
 	      (*cfg).LR, &rslt[0], &(*data).avg[k]);
-else      getDFT ((*data).nffts[k], (*data).bins[k], (*cfg).fsamp, (*cfg).ovlp,
-	       (*cfg).LR, &rslt[0], &(*data).avg[k]);
-      (*data).psd[k] = rslt[0];
-      (*data).varpsd[k] = rslt[1];
-      (*data).ps[k] = rslt[2];
-      (*data).varps[k] = rslt[3];
-      gettimeofday (&tv, NULL);
-      now = tv.tv_sec + tv.tv_usec / 1e6;
-      if (now - print > PSTEP)
-	{
-	  print = now;
-	  progress = (100 * ((double) k)) / ((double) ((*cfg).nspec));
-	  printf ("\b\b\b\b\b\b%5.1f%%", progress);
-	  fflush (stdout);
-	}
+      
+    (*data).psd[k] = rslt[0];
+    (*data).varpsd[k] = rslt[1];
+    (*data).ps[k] = rslt[2];
+    (*data).varps[k] = rslt[3];
+    gettimeofday (&tv, NULL);
+    now = tv.tv_sec + tv.tv_usec / 1e6;
+      
+    if (now - print > PSTEP)  {
+      print = now;
+      progress = (100 * ((double) k)) / ((double) ((*cfg).nspec));
+      printf ("\b\b\b\b\b\b%5.1f%%", progress);
+      fflush (stdout);
     }
+
+  }
   /* finish */
   printf ("\b\b\b\b\b\b  100%%\n");
   fflush (stdout);
@@ -592,12 +598,11 @@ calculate_fftw (tCFG * cfg, tDATA * data)
   /* import fftw "wisdom" */
   if ((wfp = fopen ((*cfg).wfn, "r")) == NULL)
     message1 ("Cannot open '%s'", (*cfg).wfn);
-  else
-    {
-      if (fftw_import_wisdom_from_file (wfp) == 0)
-	message ("Error importing wisdom");
+  else  {
+    if (fftw_import_wisdom_from_file (wfp) == 0)
+	    message ("Error importing wisdom");
       fclose (wfp);
-    }
+  }
   /* plan DFT */
   printf ("Planning...");
   fflush (stdout);
@@ -620,91 +625,88 @@ calculate_fftw (tCFG * cfg, tDATA * data)
   fftw_execute (plan);
 
   d = 2 * (out[0] * out[0]);
+
   (*data).fft_ps[0] = d;
   west_sumw[0] = 1.;
   (*data).fft_varps[0] = 0;
-  for (j = 1; j < nfft / 2 + 1; j++)
-    {
-      d = 2 * (out[j] * out[j] + out[nfft - j] * out[nfft - j]);
-      (*data).fft_ps[j] = d;
-      west_sumw[j] = 1.;
-      (*data).fft_varps[j] = 0;
-    }
+  for (j = 1; j < nfft / 2 + 1; j++)  {
+    d = 2 * (out[j] * out[j] + out[nfft - j] * out[nfft - j]);
+    (*data).fft_ps[j] = d;
+    west_sumw[j] = 1.;
+    (*data).fft_varps[j] = 0;
+  }
+
   navg = 1;
   start = nfft * (1.0 - (double) ((*cfg).ovlp / 100.));
 
   /* remaining segments */
-  while (start + nfft < nread)
-    {
+  while (start + nfft < nread)  {
+    printf (".");
+    fflush (stdout);
+    if (navg % 75 == 0)
+	    printf ("\n");
 
-      printf (".");
-      fflush (stdout);
-      if (navg % 75 == 0)
-	printf ("\n");
+  navg++;
+  remove_drift (&segm[0], &rawdata[start], nfft, (*cfg).LR);
 
-      navg++;
-      remove_drift (&segm[0], &rawdata[start], nfft, (*cfg).LR);
+  /* multiply data with window function */
+  for (i = 0; i < nfft; i++)
+  	segm[i] = segm[i] * dwin[i];
 
-      /* multiply data with window function */
-      for (i = 0; i < nfft; i++)
-	segm[i] = segm[i] * dwin[i];
+    fftw_execute (plan);
 
-      fftw_execute (plan);
+    d = 2 * (out[0] * out[0]);
+    west_q = d - (*data).fft_ps[0];
+    west_temp = west_sumw[0] + 1;
+    west_r = west_q / west_temp;
+    (*data).fft_ps[0] += west_r;
+    (*data).fft_varps[0] += west_r * west_sumw[0] * west_q;
+    west_sumw[0] = west_temp;
 
-      d = 2 * (out[0] * out[0]);
-      west_q = d - (*data).fft_ps[0];
-      west_temp = west_sumw[0] + 1;
+    for (j = 1; j < nfft / 2 + 1; j++)  {
+  	  d = 2 * (out[j] * out[j] + out[nfft - j] * out[nfft - j]);
+      west_q = d - (*data).fft_ps[j];
+      west_temp = west_sumw[j] + 1;
       west_r = west_q / west_temp;
-      (*data).fft_ps[0] += west_r;
-      (*data).fft_varps[0] += west_r * west_sumw[0] * west_q;
-      west_sumw[0] = west_temp;
-
-      for (j = 1; j < nfft / 2 + 1; j++)
-	{
-	  d = 2 * (out[j] * out[j] + out[nfft - j] * out[nfft - j]);
-	  west_q = d - (*data).fft_ps[j];
-	  west_temp = west_sumw[j] + 1;
-	  west_r = west_q / west_temp;
-	  (*data).fft_ps[j] += west_r;
-	  (*data).fft_varps[j] += west_r * west_sumw[j] * west_q;
-	  west_sumw[j] = west_temp;
-	}
-      start += nfft * (1.0 - (double) ((*cfg).ovlp / 100.));	/* go to next segment */
+      (*data).fft_ps[j] += west_r;
+      (*data).fft_varps[j] += west_r * west_sumw[j] * west_q;
+      west_sumw[j] = west_temp;
     }
 
-  if (navg > 1)
-    {
-      for (i = 0; i < nfft / 2 + 1; i++)
-	{
-	  (*data).fft_varps[i] =
-	    sqrt ((*data).fft_varps[i] / ((double) navg - 1));
-	}
-    }
-  else
-    {
-      for (i = 0; i < nfft / 2 + 1; i++)
-	{
-	  (*data).fft_varps[i] = (*data).fft_ps[i];
-	}
-    }
+    start += nfft * (1.0 - (double) ((*cfg).ovlp / 100.));	/* go to next segment */
+  } //end-while loop over remaning segments
+
+  if (navg > 1) {
+    
+    for (i = 0; i < nfft / 2 + 1; i++)  {
+	  (*data).fft_varps[i] = sqrt ((*data).fft_varps[i] / ((double) navg - 1));
+	  }
+  }
+  else  {
+
+    for (i = 0; i < nfft / 2 + 1; i++)  {
+	    (*data).fft_varps[i] = (*data).fft_ps[i];
+	  }
+  }
   /* normalizations and additional information */
   j = 0;
-  for (i = 0; i < nfft / 2 + 1; i++)
-    {
-      if (((*cfg).fres * i >= (*cfg).fmin) &&
-	  ((*cfg).fres * i <= (*cfg).fmax) && ((*cfg).sbin <= i))
-	{
-	  (*data).fspec[j] = (*cfg).fres * i;
-	  (*data).ps[j] = (*data).fft_ps[i] / (winsum * winsum);
-	  (*data).varps[j] = (*data).fft_varps[i] / (winsum * winsum);
-	  (*data).psd[j] = (*data).fft_ps[i] / ((*cfg).fsamp * winsum2);
-	  (*data).varpsd[j] = (*data).fft_varps[i] / ((*cfg).fsamp * winsum2);
-	  (*data).avg[j] = navg;
-	  (*data).nffts[j] = nfft;
-	  (*data).bins[j] = (double) i;
-	  j++;
-	}
-    }
+  for (i = 0; i < nfft / 2 + 1; i++)  {
+
+    if (((*cfg).fres * i >= (*cfg).fmin) &&
+	      ((*cfg).fres * i <= (*cfg).fmax) && ((*cfg).sbin <= i))
+	  {
+	    (*data).fspec[j] = (*cfg).fres * i;
+	    (*data).ps[j] = (*data).fft_ps[i] / (winsum * winsum);
+      (*data).varps[j] = (*data).fft_varps[i] / (winsum * winsum);
+      (*data).psd[j] = (*data).fft_ps[i] / ((*cfg).fsamp * winsum2);
+      (*data).varpsd[j] = (*data).fft_varps[i] / ((*cfg).fsamp * winsum2);
+      (*data).avg[j] = navg;
+      (*data).nffts[j] = nfft;
+      (*data).bins[j] = (double) i;
+      j++;
+	  }
+  }
+
   printf ("done.\n");
 
   gettimeofday (&tv, NULL);
@@ -713,11 +715,10 @@ calculate_fftw (tCFG * cfg, tDATA * data)
   /* write wisdom to file */
   if ((wfp = fopen ((*cfg).wfn, "w")) == NULL)
     message1 ("Cannot open '%s'", (*cfg).wfn);
-  else
-    {
-      fftw_export_wisdom_to_file (wfp);
-      fclose (wfp);
-    }
+  else  {
+    fftw_export_wisdom_to_file (wfp);
+    fclose (wfp);
+  }
   /* clean up */
   fftw_destroy_plan (plan);
 
@@ -729,7 +730,7 @@ calculate_fftw (tCFG * cfg, tDATA * data)
   xfree (dwin);
   xfree (segm);
   xfree (out);
-}
+} //end-of calculate_fftw()
 
 /*
 	works on cfg, data structures of the calling program
@@ -744,16 +745,14 @@ calculateSpectrum (tCFG * cfg, tDATA * data)
   printf ("\nReading data, subtracting mean...\n");
   nread = floor (((*cfg).tmax - (*cfg).tmin) * (*cfg).fsamp + 1);
   read_file ((*cfg).ifn, (*cfg).ulsb, (*data).mean,
-	     (int) ((*cfg).tmin * (*cfg).fsamp), (*data).nread,
-	     (*data).comma);
+	          (int) ((*cfg).tmin * (*cfg).fsamp), (*data).nread,
+	          (*data).comma);
 
-  if ((*cfg).METHOD == 0)
-    {
-      calc_params (cfg, data);
-      calculate_lpsd (cfg, data);
-    }
-  else if ((*cfg).METHOD == 1)
-    {
+  if ((*cfg).METHOD == 0) {
+    calc_params (cfg, data);
+    calculate_lpsd (cfg, data);
+  }
+  else if ((*cfg).METHOD == 1)  {
       calculate_fftw (cfg, data);
-    }
-}
+  }
+} //end-of calculateSpectrum()
