@@ -301,7 +301,7 @@ getDFT (int nfft, double bin, double fsamp, double ovlp, int LR, double *rslt,
 	  //2nd term in M_k = M_k-1 + (x_k - M_k-1)/k
 	  west_r = west_q / west_temp;
 	  west_m += west_r; //M_k-1 + (x_k - M_k-1)/k)
-	  //S_k-1 + (x_k – M_k)*(x_k – M_k-1)
+	  //S_k-1 + (x_k - M_k)*(x_k - M_k-1)
 	  west_t += west_r * west_sumw * west_q;
 	  west_sumw = west_temp;
 
