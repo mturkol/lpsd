@@ -54,7 +54,6 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
-
 # End of https://www.gitignore.io/api/c
 lpsd-exec
 example/test.dat
