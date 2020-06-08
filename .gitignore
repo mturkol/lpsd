@@ -62,4 +62,5 @@ example/lpsd_test
 example/*.gnu
 example/*.txt
 .vs/
+.vscode/
 FFTW-wisdom
