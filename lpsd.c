@@ -270,7 +270,7 @@ getDFT (int nfft, double bin, double fsamp, double ovlp, int LR, double *rslt,
   nsum = 1;
 
   /* calculate first DFT */
-  dft_re = dft_im = 0;
+  dft_re = dft_im = 0.;
   for (i = 0, j = 0; i < nfft; i++, j += 2) {
     dft_re += dwincs[j] * segm[i];
     dft_im += dwincs[j + 1] * segm[i];
@@ -282,16 +282,16 @@ getDFT (int nfft, double bin, double fsamp, double ovlp, int LR, double *rslt,
   west_t = 0.;
 
   //start += nfft * (1.0 - (double) (ovlp / 100.));	/* go to next segment */
-  //int xOlap = round(nfft * (double)(ovlp / 100.));
-  int segOffset = MAX(1, floor(nfft * (1.0 - (double)(ovlp / 100.))));
-  //int segOffset = MAX(1, nfft - xOlap);
+  int xOlap = round( (double)nfft * (ovlp / 100.) );
+  //int segOffset = MAX(1, floor(nfft * (1.0 - (double)(ovlp / 100.))));
+  int segOffset = MAX(1, nfft - xOlap);
   start += segOffset; /* go to next segment */
   /* process other segments if available */
   while (start + nfft <= nread) { //(start + nfft < nread)
       remove_drift (&segm[0], &data[start], nfft, LR);
 
       /* calculate DFT */
-      dft_re = dft_im = 0;
+      dft_re = dft_im = 0.;
       for (i = 0, j = 0; i < nfft; i++, j += 2) {
         dft_re += dwincs[j] * segm[i];
         dft_im += dwincs[j + 1] * segm[i];
@@ -373,7 +373,7 @@ getDFT2 (int nfft, double bin, double fsamp, double ovlp, int LR,
   nsum = 1;
 
   /* calculate first DFT */
-  dft_re = dft_im = 0;
+  dft_re = dft_im = 0.;
   datp = data;
   winp = dwincs;
   for (i = 0; i < nfft; i++)  {
@@ -388,16 +388,16 @@ getDFT2 (int nfft, double bin, double fsamp, double ovlp, int LR,
   west_t = 0.;
 
   //start += nfft * (1.0 - (double) (ovlp / 100.));	/* go to next segment */
-  //int xOlap = round(nfft * (double)(ovlp / 100.));
-  int segOffset = MAX(1, floor(nfft * (1.0 - (double)(ovlp / 100.))));
-  //int segOffset = MAX( 1, nfft - xOlap );
+  int xOlap = round( (double)nfft * (ovlp / 100.) );
+  //int segOffset = MAX(1, floor(nfft * (1.0 - (double)(ovlp / 100.))));
+  int segOffset = MAX( 1, nfft - xOlap );
   start += segOffset; /* go to next segment */
   /* process other segments if available */
   while (start + nfft <= nread) { //(start + nfft < nread)
     remove_drift2 (&a, &b, &data[start], nfft, LR);
 
     /* calculate DFT */
-    dft_re = dft_im = 0;
+    dft_re = dft_im = 0.;
     datp = data + start;
     winp = dwincs;
 
